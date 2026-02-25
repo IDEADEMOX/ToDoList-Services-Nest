@@ -23,7 +23,6 @@ export class Todo {
   // 代办描述(可选)
   @Column({
     type: 'text',
-    length: 255,
     comment: '代办描述',
   })
   description: string;
