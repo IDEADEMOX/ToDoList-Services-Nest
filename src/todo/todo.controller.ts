@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -21,12 +12,8 @@ export class TodoController {
    * POST /todos/create
    */
   @Post('create')
-  async create(@Body() createTodoDto: CreateTodoDto) {
-    const res = await this.todoService.create(createTodoDto);
-    return {
-      success: true,
-      data: res,
-    };
+  create(@Body() createTodoDto: CreateTodoDto) {
+    return this.todoService.create(createTodoDto);
   }
 
   /**
@@ -34,13 +21,8 @@ export class TodoController {
    * GET /todos/list
    */
   @Get('list')
-  async findAll() {
-    const res = await this.todoService.findAll();
-    return {
-      success: true,
-      data: res,
-      count: res.length,
-    };
+  findAll() {
+    return this.todoService.findAll();
   }
 
   /**
@@ -48,13 +30,9 @@ export class TodoController {
    * POST /todos/updateStatus
    */
   @Post('updateStatus')
-  async update(@Body() updateTodoDto: UpdateTodoDto) {
+  update(@Body() updateTodoDto: UpdateTodoDto) {
     const { id, ...rest } = updateTodoDto;
-    const res = await this.todoService.update(id || '', rest);
-    return {
-      success: true,
-      data: res,
-    };
+    return this.todoService.update(id || '', rest);
   }
 
   /**

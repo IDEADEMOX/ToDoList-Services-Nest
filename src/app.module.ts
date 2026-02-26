@@ -1,9 +1,16 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'; // 引入全局装饰器
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TodoModule } from './todo/todo.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import {
+  HttpExceptionFilter,
+  AllExceptionsFilter,
+} from './common/filters/http-exception.filter';
+import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 
 @Module({
   imports: [
@@ -31,6 +38,27 @@ import { TodoModule } from './todo/todo.module';
     TodoModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    // 全局注册异常过滤器（先捕获 HttpException，再捕获所有异常）
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    // 全局注册响应拦截器
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // 对所有 API 路由应用 LoggerMiddleware 中间件
+    consumer.apply(LoggerMiddleware).forRoutes('api');
+  }
+}
