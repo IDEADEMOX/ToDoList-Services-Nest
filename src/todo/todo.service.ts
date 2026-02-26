@@ -18,6 +18,7 @@ export class TodoService {
    * @returns 创建后的待办数据
    */
   async create(createTodoDto: CreateTodoDto): Promise<Todo> {
+    console.log('createTodoDto', createTodoDto);
     const todo = this.todoRepository.create(createTodoDto);
     return this.todoRepository.save(todo);
   }
@@ -79,27 +80,6 @@ export class TodoService {
     return {
       success: false,
       message: `待办事项 ID: ${id} 删除失败`,
-    };
-  }
-
-  /**
-   * 批量删除待办事项
-   * @param ids 待办 ID 数组
-   * @returns 删除结果
-   */
-  async removeBatch(
-    ids: string[],
-  ): Promise<{ success: boolean; message: string }> {
-    const result = await this.todoRepository.delete(ids);
-    if (result.affected && result.affected > 0) {
-      return {
-        success: true,
-        message: `成功删除 ${result.affected} 条待办事项`,
-      };
-    }
-    return {
-      success: false,
-      message: '删除失败，未找到对应待办事项',
     };
   }
 }

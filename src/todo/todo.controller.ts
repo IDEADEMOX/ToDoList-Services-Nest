@@ -12,63 +12,57 @@ import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 
-@Controller('todos') // 基础路由：/todos
+@Controller('api/todos') // 基础路由：/api/todos
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
   /**
    * 创建待办事项
-   * POST /todos
+   * POST /todos/create
    */
-  @Post()
-  create(@Body() createTodoDto: CreateTodoDto) {
-    return this.todoService.create(createTodoDto);
+  @Post('create')
+  async create(@Body() createTodoDto: CreateTodoDto) {
+    const res = await this.todoService.create(createTodoDto);
+    return {
+      success: true,
+      data: res,
+    };
   }
 
   /**
    * 查询所有待办事项
-   * GET /todos
+   * GET /todos/list
    */
-  @Get()
-  findAll() {
-    return this.todoService.findAll();
-  }
-
-  /**
-   * 根据 ID 查询单个待办事项
-   * GET /todos/:id
-   */
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.todoService.findOne(id);
+  @Get('list')
+  async findAll() {
+    const res = await this.todoService.findAll();
+    return {
+      success: true,
+      data: res,
+      count: res.length,
+    };
   }
 
   /**
    * 更新待办事项
-   * PATCH /todos/:id
+   * POST /todos/updateStatus
    */
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto) {
-    return this.todoService.update(id, updateTodoDto);
+  @Post('updateStatus')
+  async update(@Body() updateTodoDto: UpdateTodoDto) {
+    const { id, ...rest } = updateTodoDto;
+    const res = await this.todoService.update(id || '', rest);
+    return {
+      success: true,
+      data: res,
+    };
   }
 
   /**
    * 删除单个待办事项
-   * DELETE /todos/:id
+   * POST /todos/delete
    */
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Post('delete')
+  remove(@Body('id') id: string) {
     return this.todoService.remove(id);
-  }
-
-  /**
-   * 批量删除待办事项
-   * DELETE /todos
-   * 请求示例：DELETE /todos?ids=uuid1,uuid2,uuid3
-   */
-  @Delete()
-  removeBatch(@Query('ids') ids: string) {
-    const idArray = ids.split(','); // 将逗号分隔的字符串转为数组
-    return this.todoService.removeBatch(idArray);
   }
 }

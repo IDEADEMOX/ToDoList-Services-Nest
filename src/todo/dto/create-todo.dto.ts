@@ -1,6 +1,11 @@
 import { IsBoolean, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateTodoDto {
+  // 代办事项ID(可选)
+  @IsOptional()
+  @IsString()
+  id?: string;
+
   // 代办标题
   @IsString()
   @Length(1, 200, { message: '标题长度必须在 1-200 字符之间' })
